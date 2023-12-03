@@ -21,6 +21,12 @@ def game_is_possible(game_string: str, dice_totals: dict) -> bool:
             return False
     return True
 
+def find_cube_power(cube_dict: dict) -> int:
+    power = 1
+    for number in cube_dict.values():
+        power *= number
+    return power
+
 def parse_games(game_strings: list[str]) -> list[str]:
     game_list = [line.split(': ')[1].strip() for line in game_strings]
     return game_list

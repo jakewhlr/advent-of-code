@@ -1,5 +1,5 @@
 import unittest
-from dice_game import find_color_max, game_is_possible
+from dice_game import find_color_max, find_color_min, game_is_possible
 
 class TestGameChecker(unittest.TestCase):
     def test_find_color_max(self):
