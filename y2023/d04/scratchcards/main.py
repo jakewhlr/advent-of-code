@@ -1,96 +1,43 @@
-def parse_schematic_string(schematic_string: str) -> list[list]:
-    return [list(line.strip()) for line in schematic_string.split('\n')]
+class Scratchcard:
+    winning_numbers: list[int]
+    revealed_numbers: list[int]
+    score: int
 
-def find_part_numbers(schematic: list[list]) -> list[int]:
-    condensed_schematic = []
-    for line in schematic:
-        condensed_schematic.append(condense_numbers(line))
-    parts = []
-    for line_number, line in enumerate(condensed_schematic):
-        for index, part in enumerate(line):
-            if part.isnumeric():
-               for i in range(-1, 2):
-                    for j in range(-1, 2):
-                        if (line_number+i >= len(condensed_schematic)) or (line_number+i < 0):
-                            continue
-                        if (index+j >= len(line)) or (index+j < 0):
-                            continue
-                        if i == j == 0:
-                            continue 
-                        if condensed_schematic[line_number+i][index+j] == '.':
-                            continue
-                        if not condensed_schematic[line_number+i][index+j].isalnum():
-                            parts.append(int(part))
-                            k = 0
-                            while condensed_schematic[line_number][index-k].isnumeric():
-                                condensed_schematic[line_number][index-k] = '.'
-                                k += 1
-                                if index - k < 0:
-                                    break
-                            k = 1
-                            while condensed_schematic[line_number][index+k].isnumeric():
-                                condensed_schematic[line_number][index+k] = '.'
-                                k += 1
-                                if index + k >= len(condensed_schematic[line_number]):
-                                    break
-    return parts
+    def __init__(self, winning_numbers: list[int], revealed_numbers: list[int]):
+        self.winning_numbers = winning_numbers
+        self.revealed_numbers = revealed_numbers
+        self.score = 0
+    
+    def check_winning_numbers(self) -> list[int]:
+        matches = [number for number in self.revealed_numbers if number in self.winning_numbers]
+        return matches
 
-def find_gear_ratios(schematic: list[list]) -> int:
-    # Not working :(
-    gear_ratios = []
-    condensed_schematic = []
-    for line in schematic:
-        condensed_schematic.append(condense_numbers(line))
-    for line_number, line in enumerate(condensed_schematic):
-        for index, part in enumerate(line):
-            if part == '*':
-                adjacent_parts = []
-                for i in [-1, 0, 1]:
-                    for j in [-1, 0, 1]:
-                        if (line_number+i >= len(condensed_schematic)) or (line_number+i < 0): continue
-                        if (index+j >= len(line)) or (index+j < 0): continue
-                        if i == j == 0: continue
-                        if condensed_schematic[line_number+i][index+j] == '.': continue
-                        if condensed_schematic[line_number+i][index+j].isnumeric():
-                            adjacent_parts.append(int(condensed_schematic[line_number+i][index+j]))
-                            k = -1
-                            if index-k >= 0: 
-                                while condensed_schematic[line_number][index-k].isnumeric():
-                                    condensed_schematic[line_number][index-k] = '.'
-                                    k += 1
-                                    if index - k < 0:
-                                        break
-                            k = 1
-                            while condensed_schematic[line_number][index+k].isnumeric():
-                                condensed_schematic[line_number][index+k] = '.'
-                                k += 1
-                                if index + k >= len(condensed_schematic[line_number]): break
-                if len(adjacent_parts) == 2:
-                    gear_ratios.append(adjacent_parts[0] * adjacent_parts[1])
-    return sum(gear_ratios)
+    def calculate_score(self) -> int:
+        matches = self.check_winning_numbers()
+        return 2**(len(matches)-1) if matches  else 0
 
-def condense_numbers(schematic_line: list[str]) -> list[str]:
-    new_line = []
-    line_iter = enumerate(schematic_line)
-    number_indexes = []
-    for index, item in line_iter:
-        if len(number_indexes) > 1:
-            number_indexes.pop()
-            continue
-        number_indexes = []
-        if item.isnumeric():
-            new_index = index
-            digits = []
-            while new_index < len(schematic_line):
-                if schematic_line[new_index].isnumeric():
-                    digits.append(schematic_line[new_index])
-                    number_indexes.append(new_index)
-                else:
-                    break
-                new_index += 1
-            for i in number_indexes:
-                new_line.append(f"{''.join(digits)}")
-        else:
-            new_line.append(item)
-    return new_line
-            
+class ScratchcardPile:
+    def __init__(self, input_string: str):
+        self.scratchcards: list[Scratchcard] = self._parse_input_string(input_string)
+
+    def _parse_input_string(self, input_lines: str):
+        cards_list: list[Scratchcard] = []
+        for line in input_lines.split('\n'):
+            winning_numbers: list[int] = []
+            revealed_numbers: list[int] = []
+            split_line = line.split(': ')[1].split(' | ')
+            for number in split_line[0].split(' '):
+                if number.strip().isnumeric():
+                    winning_numbers.append(int(number))
+            for number in split_line[1].split(' '):
+                if number.strip().isnumeric():
+                    revealed_numbers.append(int(number))
+            cards_list.append(Scratchcard(winning_numbers, revealed_numbers))
+        return cards_list
+
+    def generate_copies(self):
+        # TODO some recursion
+        index = 0
+        while index < len(self.scratchcards):
+            winning_numbers_count = len(self.scratchcards[index].check_winning_numbers) 
+            index += 1
