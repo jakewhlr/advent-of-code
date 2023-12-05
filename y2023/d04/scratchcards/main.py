@@ -36,7 +36,8 @@ class ScratchcardPile:
         return cards_list
 
     def generate_copies(self):
-        # TODO some recursion
+        # TODO recursive function to get the count of matching numbers, multiplied by the count of
+        # numbers underneath it. If 0, return 1 (the card itself)
         index = 0
         while index < len(self.scratchcards):
             winning_numbers_count = len(self.scratchcards[index].check_winning_numbers) 
