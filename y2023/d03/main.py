@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from gear_ratios import parse_schematic_string, find_part_numbers, condense_numbers
+from gear_ratios import parse_schematic_string, find_part_numbers, find_gear_ratios
 
 example_string = """467..114..
                     ...*......
@@ -21,7 +21,7 @@ def part_one():
 def part_two():
     with open('data/input') as f:
         lines = f.read()
-    return 0 
+    return find_gear_ratios(parse_schematic_string(lines))
 
 def main():
     print(f"Part 01: {part_one()}")
